@@ -229,16 +229,16 @@ export default class MainMenuScene extends Phaser.Scene {
     
     // 阻止所有滑鼠事件穿透
     overlay.on('pointerdown', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     overlay.on('pointermove', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     overlay.on('pointerover', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     overlay.on('pointerout', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     
     // 設定對話框
@@ -302,7 +302,7 @@ export default class MainMenuScene extends Phaser.Scene {
     toggleButton.on('pointerup', (event) => {
       // 只在開關切換時阻止事件冒泡
       if (event.target === toggleButton || event.target === toggleButton.canvas) {
-        event.stopPropagation();
+        // Phaser 3 中透過 setInteractive 來阻止事件穿透
       }
       
       const currentSetting = getSetting('showVirtualJoystick', false);
@@ -337,7 +337,7 @@ export default class MainMenuScene extends Phaser.Scene {
     closeBtn.on('pointerup', (event) => {
       // 只在對話框關閉時阻止事件冒泡
       if (event.target === closeBtn || event.target === closeBtn.canvas) {
-        event.stopPropagation();
+        // Phaser 3 中透過 setInteractive 來阻止事件穿透
       }
       
       overlay.destroy();
@@ -353,7 +353,7 @@ export default class MainMenuScene extends Phaser.Scene {
     // 遮罩層事件處理 - 完全阻止事件穿透
     overlay.on('pointerup', (event) => {
       // 無論如何都要阻止事件傳播
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
       
       // 如果點擊的是遮罩層本身，關閉對話框
       if (event.target === overlay || event.target === overlay.canvas) {
@@ -380,16 +380,16 @@ export default class MainMenuScene extends Phaser.Scene {
     
     // 阻止所有滑鼠事件穿透
     overlay.on('pointerdown', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     overlay.on('pointermove', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     overlay.on('pointerover', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     overlay.on('pointerout', (event) => {
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
     });
     
     const infoBox = this.add.rectangle(width / 2, height / 2, 800, 500, 0x1a1a2e);
@@ -445,7 +445,7 @@ export default class MainMenuScene extends Phaser.Scene {
     closeBtn.on('pointerup', (event) => {
       // 只在對話框關閉時阻止事件冒泡
       if (event.target === closeBtn || event.target === closeBtn.canvas) {
-        event.stopPropagation();
+        // Phaser 3 中透過 setInteractive 來阻止事件穿透
       }
       
       overlay.destroy();
@@ -457,17 +457,14 @@ export default class MainMenuScene extends Phaser.Scene {
     
     // 遮罩層事件處理 - 完全阻止事件穿透
     overlay.on('pointerup', (event) => {
-      // 無論如何都要阻止事件傳播
-      event.stopPropagation();
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
       
-      // 如果點擊的是遮罩層本身，關閉對話框
-      if (event.target === overlay || event.target === overlay.canvas) {
-        overlay.destroy();
-        infoBox.destroy();
-        title.destroy();
-        infoText.destroy();
-        closeBtn.destroy();
-      }
+      // 關閉對話框
+      overlay.destroy();
+      infoBox.destroy();
+      title.destroy();
+      infoText.destroy();
+      closeBtn.destroy();
     });
   }
 }

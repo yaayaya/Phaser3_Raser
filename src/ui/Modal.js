@@ -14,9 +14,7 @@ export default class Modal {
     // 標記是否為手機設備
     this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
-    // 綁定方法到this，確保正確的上下文
-    this.handleOverlayClick = this.handleOverlayClick.bind(this);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
+    // Modal設定完成
   }
   
   /**
@@ -65,83 +63,25 @@ export default class Modal {
    * 設置遮罩層事件，完全阻止穿透
    */
   setupOverlayEvents() {
-    // 創建強力的事件阻止函數
-    const blockEvent = (event) => {
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-      return false;
-    };
-    
-    // 阻止所有可能的事件類型
-    const eventTypes = [
-      'pointerdown', 'pointerup', 'pointermove', 'pointerover', 'pointerout',
-      'touchstart', 'touchmove', 'touchend', 'touchcancel',
-      'mousedown', 'mouseup', 'mousemove', 'click'
-    ];
-    
-    eventTypes.forEach(eventType => {
-      this.overlay.on(eventType, blockEvent);
+    // 只處理點擊事件來關閉Modal
+    this.overlay.on('pointerup', (event) => {
+      console.log('Overlay clicked, closing modal');
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透
+      this.close();
     });
     
-    // 特殊處理遮罩層點擊關閉
-    this.overlay.on('pointerup', this.handleOverlayClick);
+    // 阻止其他事件穿透
+    const blockEvents = ['pointerdown', 'pointermove'];
+    blockEvents.forEach(eventType => {
+      this.overlay.on(eventType, (event) => {
+        // Phaser 3 中透過 setInteractive 來阻止事件穿透
+      });
+    });
   }
   
-  /**
-   * 處理遮罩層點擊
-   */
-  handleOverlayClick(event) {
-    // 阻止事件傳播
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    if (event.preventDefault) {
-      event.preventDefault();
-    }
-    
-    // 檢查是否點擊的是遮罩層本身
-    if (event.target === this.overlay) {
-      if (this.isMobile) {
-        // 手機版延遲關閉
-        setTimeout(() => {
-          this.close();
-        }, 200);
-      } else {
-        this.close();
-      }
-    }
-    
-    return false;
-  }
+
   
-  /**
-   * 處理按鈕點擊
-   */
-  handleButtonClick(event, callback) {
-    // 強制阻止事件傳播
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    if (event.preventDefault) {
-      event.preventDefault();
-    }
-    
-    if (this.isMobile) {
-      // 手機版延遲執行
-      setTimeout(() => {
-        if (callback) {
-          callback();
-        }
-      }, 200);
-    } else {
-      if (callback) {
-        callback();
-      }
-    }
-    
-    return false;
-  }
+
   
   /**
    * 添加文字元素
@@ -170,24 +110,21 @@ export default class Modal {
     const height = style.height || 40;
     
     // 按鈕背景
-    const bg = this.scene.add.rectangle(x, y, width, height, style.bgColor || 0x00ffff, style.bgAlpha || 0.2);
+    const bg = this.scene.add.rectangle(0, 0, width, height, style.bgColor || 0x00ffff, style.bgAlpha || 0.2);
     bg.setStrokeStyle(style.borderWidth || 2, style.borderColor || 0x00ffff);
-    bg.setDepth(10003);
     
     // 按鈕文字
-    const label = this.scene.add.text(x, y, text, {
+    const label = this.scene.add.text(0, 0, text, {
       font: style.font || 'bold 18px Arial',
       fill: style.textColor || COLORS.PRIMARY
     });
     label.setOrigin(0.5);
-    label.setDepth(10004);
     
     // 創建按鈕容器
     const button = this.scene.add.container(x, y);
     button.add([bg, label]);
     button.setSize(width, height);
     button.setInteractive({ useHandCursor: true });
-    button.setDepth(10004);
     
     // 按鈕事件
     button.on('pointerover', () => {
@@ -203,8 +140,13 @@ export default class Modal {
     });
     
     button.on('pointerup', (event) => {
+      console.log('Modal button clicked:', text);
+      // Phaser 3 中透過 setInteractive 來阻止事件穿透到 overlay
       bg.setFillStyle(style.hoverBgColor || style.bgColor || 0x00ffff, style.hoverBgAlpha || 0.4);
-      this.handleButtonClick(event, callback);
+      
+      if (callback) {
+        callback();
+      }
     });
     
     this.container.add(button);
@@ -225,7 +167,15 @@ export default class Modal {
    * 關閉Modal
    */
   close() {
-    if (!this.isOpen) return;
+    console.log('Modal.close() called, isOpen:', this.isOpen);
+    
+    if (!this.isOpen) {
+      console.log('Modal already closed');
+      return;
+    }
+    
+    // 立即設為關閉狀態防止重複調用
+    this.isOpen = false;
     
     // 執行關閉回調
     if (this.onCloseCallback) {
@@ -248,8 +198,9 @@ export default class Modal {
     this.container = null;
     this.overlay = null;
     this.dialogBg = null;
-    this.isOpen = false;
     this.onCloseCallback = null;
+    
+    console.log('Modal closed successfully');
   }
   
   /**
