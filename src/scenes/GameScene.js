@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { SCENES, CANVAS, PLAYER, GAME, VIRTUAL_JOYSTICK } from '../utils/constants.js';
-import { getGameData, updateCoins, unlockLevel, completeLevel } from '../utils/storage.js';
+import { getGameData, updateCoins, unlockLevel, completeLevel, getSetting } from '../utils/storage.js';
 import Player from '../entities/Player.js';
 import EnemyManager from '../systems/EnemyManager.js';
 import WeaponSystem from '../systems/WeaponSystem.js';
@@ -190,20 +190,31 @@ export default class GameScene extends Phaser.Scene {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
     if (isTouchDevice) {
-      // 建立隱形虛擬搖桿
+      // 取得UI顯示設定
+      const showJoystickUI = getSetting('showVirtualJoystick', false);
+      
+      // 建立虛擬搖桿
       this.virtualJoystick = new VirtualJoystick(this, 0, 0, {
-        baseRadius: 0, // 不需要視覺範圍
-        stickRadius: 0,
-        maxDistance: 999, // 無限制距離
-        deadZone: 0.05, // 很小的死區
-        alpha: 0 // 完全透明
+        baseRadius: showJoystickUI ? 45 : 0,
+        stickRadius: showJoystickUI ? 20 : 0,
+        maxDistance: 999,
+        deadZone: 0.05,
+        alpha: showJoystickUI ? 0.7 : 0,
+        showUI: showJoystickUI
       });
       
       // 設定全螢幕觸控
       this.input.on('pointerdown', (pointer) => {
-        // 任意位置都可以開始控制
         this.virtualJoystick.startDrag(pointer);
       });
+      
+      // 如果開啟UI，在左下角顯示搖桿
+      if (showJoystickUI) {
+        const joystickX = 80;
+        const joystickY = CANVAS.ACTUAL_HEIGHT - 80;
+        this.virtualJoystick.setPosition(joystickX, joystickY);
+        this.virtualJoystick.setVisible(true);
+      }
     }
   }
   
@@ -407,7 +418,7 @@ export default class GameScene extends Phaser.Scene {
             speed: 80,
             health: 40,
             reward: 8,
-            damage: 5
+            damage: 1
           }
         ],
         rewards: {
@@ -425,7 +436,7 @@ export default class GameScene extends Phaser.Scene {
             speed: 90,
             health: 50,
             reward: 10,
-            damage: 6
+            damage: 1
           },
           {
             type: 'fast',
@@ -433,7 +444,7 @@ export default class GameScene extends Phaser.Scene {
             speed: 140,
             health: 30,
             reward: 15,
-            damage: 8
+            damage: 1
           }
         ],
         rewards: {
@@ -451,7 +462,7 @@ export default class GameScene extends Phaser.Scene {
             speed: 100,
             health: 60,
             reward: 12,
-            damage: 7
+            damage: 1
           },
           {
             type: 'tank',
@@ -459,7 +470,7 @@ export default class GameScene extends Phaser.Scene {
             speed: 50,
             health: 150,
             reward: 25,
-            damage: 18
+            damage: 1
           }
         ],
         rewards: {

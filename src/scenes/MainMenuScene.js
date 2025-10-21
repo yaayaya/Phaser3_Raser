@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { SCENES, COLORS } from '../utils/constants.js';
-import { getGameData, resetGameData } from '../utils/storage.js';
+import { getGameData, resetGameData, getSetting, updateSetting } from '../utils/storage.js';
 import { formatNumber } from '../utils/helpers.js';
 
 /**
@@ -49,18 +49,29 @@ export default class MainMenuScene extends Phaser.Scene {
       this.scene.start(SCENES.UPGRADE_SHOP);
     });
     
-    this.createButton(width / 2, 420, '遊戲說明', () => {
+    this.createButton(width / 2, 420, '遊戲設定', () => {
+      this.showSettings();
+    });
+    
+    this.createButton(width / 2, 490, '遊戲說明', () => {
       this.showGameInfo();
     });
     
     // 重置按鈕（小字體，放在下方）
-    this.createResetButton(width / 2, 500);
+    this.createResetButton(width / 2, 560);
     
     // 版本資訊
-    this.add.text(width - 10, height - 10, 'v1.2.0', {
+    const versionText = this.add.text(width - 10, height - 10, 'v1.2.0', {
       font: '14px Arial',
       fill: COLORS.TEXT_DISABLED
-    }).setOrigin(1, 1);
+    });
+    versionText.setOrigin(1, 1);
+    
+    // 確保所有固定UI元素在最上層
+    this.children.bringToTop(title);
+    this.children.bringToTop(subtitle);
+    this.children.bringToTop(coinsText);
+    this.children.bringToTop(versionText);
   }
   
   createButton(x, y, text, callback) {
@@ -91,7 +102,8 @@ export default class MainMenuScene extends Phaser.Scene {
       bg.setFillStyle(0x00ffff, 0.6);
     });
     
-    button.on('pointerup', () => {
+    button.on('pointerup', (event) => {
+      // 只在正常按鈕點擊時執行callback，不阻止事件傳播
       bg.setFillStyle(0x00ffff, 0.4);
       callback();
     });
@@ -129,7 +141,8 @@ export default class MainMenuScene extends Phaser.Scene {
       bg.setFillStyle(0xff3333, 0.5);
     });
     
-    button.on('pointerup', () => {
+    button.on('pointerup', (event) => {
+      // 只在正常按鈕點擊時執行，不阻止事件傳播
       bg.setFillStyle(0xff3333, 0.3);
       this.showResetConfirmation();
     });
@@ -190,7 +203,12 @@ export default class MainMenuScene extends Phaser.Scene {
       confirmBg.setFillStyle(0xff3333, 0.2);
     });
     
-    confirmBtn.on('pointerup', () => {
+    confirmBtn.on('pointerup', (event) => {
+      // 只在確認重置時阻止事件冒泡
+      if (event.target === confirmBtn || event.target === confirmBtn.canvas) {
+        event.stopPropagation();
+      }
+      
       // 執行重置
       resetGameData();
       
@@ -229,7 +247,12 @@ export default class MainMenuScene extends Phaser.Scene {
       cancelBg.setFillStyle(0x00ffff, 0.2);
     });
     
-    cancelBtn.on('pointerup', () => {
+    cancelBtn.on('pointerup', (event) => {
+      // 只在對話框取消時阻止事件冒泡
+      if (event.target === cancelBtn || event.target === cancelBtn.canvas) {
+        event.stopPropagation();
+      }
+      
       overlay.destroy();
       dialogBox.destroy();
       warningIcon.destroy();
@@ -241,9 +264,152 @@ export default class MainMenuScene extends Phaser.Scene {
       cancelBg.destroy();
     });
     
+    // 遮罩層點擊關閉對話框
+    overlay.on('pointerup', (event) => {
+      if (event.target === overlay.canvas) {
+        event.stopPropagation();
+        overlay.destroy();
+        dialogBox.destroy();
+        warningIcon.destroy();
+        title.destroy();
+        description.destroy();
+        confirmBtn.destroy();
+        confirmBg.destroy();
+        cancelBtn.destroy();
+        cancelBg.destroy();
+      }
+    });
+    
     // 確保按鈕在背景之上
     this.children.bringToTop(confirmBtn);
     this.children.bringToTop(cancelBtn);
+  }
+  
+  showSettings() {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    
+    // 遮罩層
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
+    overlay.setInteractive();
+    
+    // 設定對話框
+    const dialogBox = this.add.rectangle(width / 2, height / 2, 350, 280, 0x1a1a2e);
+    dialogBox.setStrokeStyle(2, 0x00ffff);
+    
+    // 標題
+    const title = this.add.text(width / 2, height / 2 - 110, '遊戲設定', {
+      font: 'bold 28px Arial',
+      fill: COLORS.PRIMARY
+    });
+    title.setOrigin(0.5);
+    
+    // 虛擬搖桿UI設定
+    const showJoystickUI = getSetting('showVirtualJoystick', false);
+    
+    const joystickLabel = this.add.text(width / 2 - 120, height / 2 - 50, '虛擬搖桿UI：', {
+      font: '20px Arial',
+      fill: COLORS.TEXT
+    });
+    joystickLabel.setOrigin(0, 0.5);
+    
+    // 開關按鈕
+    const toggleButton = this.add.rectangle(width / 2 + 80, height / 2 - 50, 80, 35, 
+      showJoystickUI ? 0x00ff00 : 0x666666);
+    toggleButton.setStrokeStyle(2, showJoystickUI ? 0x00ffff : 0x999999);
+    toggleButton.setInteractive({ useHandCursor: true });
+    
+    const toggleText = this.add.text(width / 2 + 80, height / 2 - 50, 
+      showJoystickUI ? '開啟' : '關閉', {
+      font: 'bold 16px Arial',
+      fill: COLORS.TEXT
+    });
+    toggleText.setOrigin(0.5);
+    
+    // 設定說明
+    const description = this.add.text(width / 2, height / 2 - 10, 
+      '顯示虛擬搖桿的外觀（底座和搖桿頭）\n關閉後仍可使用觸控操作', {
+      font: '14px Arial',
+      fill: COLORS.TEXT_DISABLED,
+      align: 'center'
+    });
+    description.setOrigin(0.5);
+    
+    // 開關事件
+    toggleButton.on('pointerover', () => {
+      toggleButton.setStrokeStyle(3, 0x00ffff);
+    });
+    
+    toggleButton.on('pointerout', () => {
+      const isOn = getSetting('showVirtualJoystick', false);
+      toggleButton.setStrokeStyle(2, isOn ? 0x00ffff : 0x999999);
+    });
+    
+    toggleButton.on('pointerup', (event) => {
+      // 只在開關切換時阻止事件冒泡
+      if (event.target === toggleButton || event.target === toggleButton.canvas) {
+        event.stopPropagation();
+      }
+      
+      const currentSetting = getSetting('showVirtualJoystick', false);
+      const newSetting = !currentSetting;
+      
+      // 更新設定
+      updateSetting('showVirtualJoystick', newSetting);
+      
+      // 更新UI
+      toggleButton.setFillStyle(newSetting ? 0x00ff00 : 0x666666);
+      toggleButton.setStrokeStyle(2, newSetting ? 0x00ffff : 0x999999);
+      toggleText.setText(newSetting ? '開啟' : '關閉');
+    });
+    
+    // 關閉按鈕
+    const closeBtn = this.add.text(width / 2, height / 2 + 90, '[ 關閉 ]', {
+      font: 'bold 20px Arial',
+      fill: COLORS.PRIMARY
+    });
+    closeBtn.setOrigin(0.5);
+    closeBtn.setInteractive({ useHandCursor: true });
+    
+    closeBtn.on('pointerover', () => {
+      closeBtn.setStyle({ fill: COLORS.SECONDARY });
+    });
+    
+    closeBtn.on('pointerout', () => {
+      closeBtn.setStyle({ fill: COLORS.PRIMARY });
+    });
+    
+    closeBtn.on('pointerup', (event) => {
+      // 只在對話框關閉時阻止事件冒泡
+      if (event.target === closeBtn || event.target === closeBtn.canvas) {
+        event.stopPropagation();
+      }
+      
+      overlay.destroy();
+      dialogBox.destroy();
+      title.destroy();
+      joystickLabel.destroy();
+      toggleButton.destroy();
+      toggleText.destroy();
+      description.destroy();
+      closeBtn.destroy();
+    });
+    
+    // 遮罩層點擊關閉對話框
+    overlay.on('pointerup', (event) => {
+      // 如果點擊的是遮罩層本身，關閉對話框
+      if (event.target === overlay.canvas) {
+        event.stopPropagation();
+        overlay.destroy();
+        dialogBox.destroy();
+        title.destroy();
+        joystickLabel.destroy();
+        toggleButton.destroy();
+        toggleText.destroy();
+        description.destroy();
+        closeBtn.destroy();
+      }
+    });
   }
   
   showGameInfo() {
@@ -299,12 +465,29 @@ export default class MainMenuScene extends Phaser.Scene {
       closeBtn.setStyle({ fill: COLORS.PRIMARY });
     });
     
-    closeBtn.on('pointerup', () => {
+    closeBtn.on('pointerup', (event) => {
+      // 只在對話框關閉時阻止事件冒泡
+      if (event.target === closeBtn || event.target === closeBtn.canvas) {
+        event.stopPropagation();
+      }
+      
       overlay.destroy();
       infoBox.destroy();
       title.destroy();
       infoText.destroy();
       closeBtn.destroy();
+    });
+    
+    // 遮罩層點擊關閉對話框
+    overlay.on('pointerup', (event) => {
+      if (event.target === overlay.canvas) {
+        event.stopPropagation();
+        overlay.destroy();
+        infoBox.destroy();
+        title.destroy();
+        infoText.destroy();
+        closeBtn.destroy();
+      }
     });
   }
 }

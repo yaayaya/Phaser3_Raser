@@ -16,19 +16,21 @@ export default class UpgradeShopScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     
-    // 標題
+    // 標題（固定在頂部）
     const title = this.add.text(width / 2, 40, '升級商店', {
       font: 'bold 32px Arial',
       fill: COLORS.PRIMARY
     });
     title.setOrigin(0.5);
+    title.setDepth(1000); // 確保在最上層
     
-    // 代幣顯示
+    // 代幣顯示（固定在頂部）
     this.coinsText = this.add.text(width / 2, 80, `💰 代幣: ${formatNumber(this.gameData.coins)}`, {
       font: 'bold 20px Arial',
       fill: COLORS.WARNING
     });
     this.coinsText.setOrigin(0.5);
+    this.coinsText.setDepth(1000); // 確保在最上層
     
     // 升級卡片
     this.createUpgradeCards();
@@ -230,6 +232,7 @@ export default class UpgradeShopScene extends Phaser.Scene {
       fill: COLORS.PRIMARY
     });
     backBtn.setInteractive({ useHandCursor: true });
+    backBtn.setDepth(1000); // 確保在最上層
     
     backBtn.on('pointerover', () => {
       backBtn.setStyle({ fill: COLORS.SECONDARY });

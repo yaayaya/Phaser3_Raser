@@ -24,6 +24,7 @@ export default class LevelSelectScene extends Phaser.Scene {
       fill: COLORS.PRIMARY
     });
     title.setOrigin(0.5);
+    title.setDepth(1000); // 確保在最上層，不被滾動內容覆蓋
     
     // 關卡資料
     const levels = [
@@ -233,6 +234,7 @@ export default class LevelSelectScene extends Phaser.Scene {
       fill: COLORS.PRIMARY
     });
     backBtn.setInteractive({ useHandCursor: true });
+    backBtn.setDepth(1000); // 確保在最上層
     
     backBtn.on('pointerover', () => {
       backBtn.setStyle({ fill: COLORS.SECONDARY });

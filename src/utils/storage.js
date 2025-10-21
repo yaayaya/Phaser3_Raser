@@ -101,6 +101,29 @@ export function completeLevel(levelId, time) {
 }
 
 /**
+ * 更新設定
+ */
+export function updateSetting(key, value) {
+  const data = getGameData();
+  if (!data.settings) {
+    data.settings = {};
+  }
+  data.settings[key] = value;
+  saveGameData(data);
+}
+
+/**
+ * 取得設定值
+ */
+export function getSetting(key, defaultValue = null) {
+  const data = getGameData();
+  if (!data.settings || data.settings[key] === undefined) {
+    return defaultValue;
+  }
+  return data.settings[key];
+}
+
+/**
  * 重置遊戲資料
  */
 export function resetGameData() {

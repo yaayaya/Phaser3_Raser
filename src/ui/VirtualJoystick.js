@@ -14,6 +14,7 @@ export default class VirtualJoystick extends Phaser.GameObjects.Container {
     this.maxDistance = config.maxDistance || 40;
     this.deadZone = config.deadZone || 0.1;
     this.alpha = config.alpha || 0.6;
+    this.showUI = config.showUI !== undefined ? config.showUI : true;
     
     // 搖桿狀態
     this.isDragging = false;
@@ -26,28 +27,38 @@ export default class VirtualJoystick extends Phaser.GameObjects.Container {
     // 設定互動
     this.setupInteraction();
     
-    // 預設隱藏
-    this.setVisible(false);
+    // 根據設定決定是否顯示
+    this.setVisible(this.showUI);
     
     // 加入場景
     scene.add.existing(this);
   }
   
   createJoystick() {
-    // 隱形搖桿 - 不建立任何視覺元素
-    // 搖桿底座 - 隱藏
-    this.base = this.scene.add.circle(0, 0, this.baseRadius, 0x333333, 0);
-    this.base.setVisible(false);
+    if (this.showUI) {
+      // 顯示UI版本
+      this.base = this.scene.add.circle(0, 0, this.baseRadius, 0x333333, this.alpha);
+      this.base.setStrokeStyle(3, 0x666666, this.alpha);
+      
+      this.stick = this.scene.add.circle(0, 0, this.stickRadius, 0x00ffff, this.alpha + 0.2);
+      this.stick.setStrokeStyle(2, 0xffffff, this.alpha + 0.3);
+      
+      this.directionLine = this.scene.add.line(0, 0, 0, 0, 0, 0, 0x00ffff, this.alpha);
+      this.directionLine.setLineWidth(3);
+      this.directionLine.setVisible(false);
+    } else {
+      // 隱形版本
+      this.base = this.scene.add.circle(0, 0, this.baseRadius, 0x333333, 0);
+      this.base.setVisible(false);
+      
+      this.stick = this.scene.add.circle(0, 0, this.stickRadius, 0x00ffff, 0);
+      this.stick.setVisible(false);
+      
+      this.directionLine = this.scene.add.line(0, 0, 0, 0, 0, 0, 0x00ffff, 0);
+      this.directionLine.setVisible(false);
+    }
     
-    // 搖桿頭 - 隱藏
-    this.stick = this.scene.add.circle(0, 0, this.stickRadius, 0x00ffff, 0);
-    this.stick.setVisible(false);
-    
-    // 方向指示器 - 隱藏
-    this.directionLine = this.scene.add.line(0, 0, 0, 0, 0, 0, 0x00ffff, 0);
-    this.directionLine.setVisible(false);
-    
-    // 加入容器（但都是隱藏的）
+    // 加入容器
     this.add([this.base, this.stick, this.directionLine]);
   }
   
@@ -78,6 +89,12 @@ export default class VirtualJoystick extends Phaser.GameObjects.Container {
     this.startX = worldPos.x;
     this.startY = worldPos.y;
     
+    // 如果顯示UI，更新搖桿位置並顯示方向線
+    if (this.showUI) {
+      this.setPosition(this.startX, this.startY);
+      this.directionLine.setVisible(true);
+    }
+    
     // 重置方向
     this.direction.x = 0;
     this.direction.y = 0;
@@ -104,6 +121,18 @@ export default class VirtualJoystick extends Phaser.GameObjects.Container {
       this.direction.x = normalizedX;
       this.direction.y = normalizedY;
       this.force = force;
+      
+      // 如果顯示UI，更新搖桿視覺元素
+      if (this.showUI && this.knob && this.directionLine) {
+        // 限制搖桿範圍
+        const limitedDistance = Math.min(distance, this.maxDistance);
+        const knobX = this.startX + normalizedX * limitedDistance;
+        const knobY = this.startY + normalizedY * limitedDistance;
+        this.knob.setPosition(knobX, knobY);
+        
+        // 更新方向線
+        this.directionLine.setTo(this.startX, this.startY, knobX, knobY);
+      }
     } else {
       this.direction.x = 0;
       this.direction.y = 0;
@@ -116,10 +145,20 @@ export default class VirtualJoystick extends Phaser.GameObjects.Container {
     
     this.isDragging = false;
     
-    // 重置方向
+    // 重置方向和力度
     this.direction.x = 0;
     this.direction.y = 0;
     this.force = 0;
+    
+    // 如果顯示UI，隱藏搖桿元素
+    if (this.showUI) {
+      if (this.knob) {
+        this.knob.setPosition(this.startX, this.startY);
+      }
+      if (this.directionLine) {
+        this.directionLine.setVisible(false);
+      }
+    }
   }
   
   /**
