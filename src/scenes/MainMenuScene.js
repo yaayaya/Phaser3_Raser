@@ -154,19 +154,36 @@ export default class MainMenuScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     
-    // 遮罩層
+    // 遮罩層 - 阻止所有點擊事件穿透
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
     overlay.setInteractive();
+    overlay.setDepth(500); // 設定適當深度
+    
+    // 阻止所有滑鼠事件穿透
+    overlay.on('pointerdown', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointermove', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointerover', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointerout', (event) => {
+      event.stopPropagation();
+    });
     
     // 對話框
     const dialogBox = this.add.rectangle(width / 2, height / 2, 320, 240, 0x1a1a2e);
     dialogBox.setStrokeStyle(3, 0xff3333);
+    dialogBox.setDepth(600); // 設定在遮罩層之上
     
     // 警告圖示
     const warningIcon = this.add.text(width / 2, height / 2 - 80, '⚠️', {
       font: '48px Arial'
     });
     warningIcon.setOrigin(0.5);
+    warningIcon.setDepth(700);
     
     // 標題
     const title = this.add.text(width / 2, height / 2 - 30, '確認重置遊戲？', {
@@ -174,6 +191,7 @@ export default class MainMenuScene extends Phaser.Scene {
       fill: '#ff3333'
     });
     title.setOrigin(0.5);
+    title.setDepth(700);
     
     // 說明文字
     const description = this.add.text(width / 2, height / 2 + 10, '將清除所有進度、代幣與升級\n此操作無法復原！', {
@@ -182,6 +200,7 @@ export default class MainMenuScene extends Phaser.Scene {
       align: 'center'
     });
     description.setOrigin(0.5);
+    description.setDepth(700);
     
     // 確認按鈕
     const confirmBtn = this.add.text(width / 2 - 70, height / 2 + 70, '確認重置', {
@@ -194,6 +213,8 @@ export default class MainMenuScene extends Phaser.Scene {
     
     const confirmBg = this.add.rectangle(width / 2 - 70, height / 2 + 70, 120, 40, 0xff3333, 0.2);
     confirmBg.setStrokeStyle(2, 0xff3333);
+    confirmBg.setDepth(650);
+    confirmBtn.setDepth(700);
     
     confirmBtn.on('pointerover', () => {
       confirmBg.setFillStyle(0xff3333, 0.4);
@@ -238,6 +259,8 @@ export default class MainMenuScene extends Phaser.Scene {
     
     const cancelBg = this.add.rectangle(width / 2 + 70, height / 2 + 70, 100, 40, 0x00ffff, 0.2);
     cancelBg.setStrokeStyle(2, 0x00ffff);
+    cancelBg.setDepth(650);
+    cancelBtn.setDepth(700);
     
     cancelBtn.on('pointerover', () => {
       cancelBg.setFillStyle(0x00ffff, 0.4);
@@ -264,10 +287,13 @@ export default class MainMenuScene extends Phaser.Scene {
       cancelBg.destroy();
     });
     
-    // 遮罩層點擊關閉對話框
+    // 遮罩層事件處理 - 完全阻止事件穿透
     overlay.on('pointerup', (event) => {
-      if (event.target === overlay.canvas) {
-        event.stopPropagation();
+      // 無論如何都要阻止事件傳播
+      event.stopPropagation();
+      
+      // 如果點擊的是遮罩層本身，關閉對話框
+      if (event.target === overlay || event.target === overlay.canvas) {
         overlay.destroy();
         dialogBox.destroy();
         warningIcon.destroy();
@@ -289,13 +315,29 @@ export default class MainMenuScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     
-    // 遮罩層
+    // 遮罩層 - 阻止所有點擊事件穿透
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
     overlay.setInteractive();
+    overlay.setDepth(500); // 設定適當深度
+    
+    // 阻止所有滑鼠事件穿透
+    overlay.on('pointerdown', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointermove', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointerover', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointerout', (event) => {
+      event.stopPropagation();
+    });
     
     // 設定對話框
     const dialogBox = this.add.rectangle(width / 2, height / 2, 350, 280, 0x1a1a2e);
     dialogBox.setStrokeStyle(2, 0x00ffff);
+    dialogBox.setDepth(600); // 設定在遮罩層之上
     
     // 標題
     const title = this.add.text(width / 2, height / 2 - 110, '遊戲設定', {
@@ -303,6 +345,7 @@ export default class MainMenuScene extends Phaser.Scene {
       fill: COLORS.PRIMARY
     });
     title.setOrigin(0.5);
+    title.setDepth(700);
     
     // 虛擬搖桿UI設定
     const showJoystickUI = getSetting('showVirtualJoystick', false);
@@ -312,12 +355,14 @@ export default class MainMenuScene extends Phaser.Scene {
       fill: COLORS.TEXT
     });
     joystickLabel.setOrigin(0, 0.5);
+    joystickLabel.setDepth(700);
     
     // 開關按鈕
     const toggleButton = this.add.rectangle(width / 2 + 80, height / 2 - 50, 80, 35, 
       showJoystickUI ? 0x00ff00 : 0x666666);
     toggleButton.setStrokeStyle(2, showJoystickUI ? 0x00ffff : 0x999999);
     toggleButton.setInteractive({ useHandCursor: true });
+    toggleButton.setDepth(700);
     
     const toggleText = this.add.text(width / 2 + 80, height / 2 - 50, 
       showJoystickUI ? '開啟' : '關閉', {
@@ -325,6 +370,7 @@ export default class MainMenuScene extends Phaser.Scene {
       fill: COLORS.TEXT
     });
     toggleText.setOrigin(0.5);
+    toggleText.setDepth(700);
     
     // 設定說明
     const description = this.add.text(width / 2, height / 2 - 10, 
@@ -334,6 +380,7 @@ export default class MainMenuScene extends Phaser.Scene {
       align: 'center'
     });
     description.setOrigin(0.5);
+    description.setDepth(700);
     
     // 開關事件
     toggleButton.on('pointerover', () => {
@@ -370,6 +417,7 @@ export default class MainMenuScene extends Phaser.Scene {
     });
     closeBtn.setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
+    closeBtn.setDepth(700);
     
     closeBtn.on('pointerover', () => {
       closeBtn.setStyle({ fill: COLORS.SECONDARY });
@@ -395,11 +443,13 @@ export default class MainMenuScene extends Phaser.Scene {
       closeBtn.destroy();
     });
     
-    // 遮罩層點擊關閉對話框
+    // 遮罩層事件處理 - 完全阻止事件穿透
     overlay.on('pointerup', (event) => {
+      // 無論如何都要阻止事件傳播
+      event.stopPropagation();
+      
       // 如果點擊的是遮罩層本身，關閉對話框
-      if (event.target === overlay.canvas) {
-        event.stopPropagation();
+      if (event.target === overlay || event.target === overlay.canvas) {
         overlay.destroy();
         dialogBox.destroy();
         title.destroy();
@@ -416,17 +466,35 @@ export default class MainMenuScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     
+    // 遮罩層 - 阻止所有點擊事件穿透
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
     overlay.setInteractive();
+    overlay.setDepth(500); // 設定適當深度
+    
+    // 阻止所有滑鼠事件穿透
+    overlay.on('pointerdown', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointermove', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointerover', (event) => {
+      event.stopPropagation();
+    });
+    overlay.on('pointerout', (event) => {
+      event.stopPropagation();
+    });
     
     const infoBox = this.add.rectangle(width / 2, height / 2, 800, 500, 0x1a1a2e);
     infoBox.setStrokeStyle(2, 0x00ffff);
+    infoBox.setDepth(600); // 設定在遮罩層之上
     
     const title = this.add.text(width / 2, height / 2 - 200, '遊戲說明', {
       font: 'bold 32px Arial',
       fill: COLORS.PRIMARY
     });
     title.setOrigin(0.5);
+    title.setDepth(700);
     
     const info = [
       '🎮 操作方式:',
@@ -449,6 +517,7 @@ export default class MainMenuScene extends Phaser.Scene {
       lineSpacing: 8
     });
     infoText.setOrigin(0.5);
+    infoText.setDepth(700);
     
     const closeBtn = this.add.text(width / 2, height / 2 + 180, '[ 關閉 ]', {
       font: 'bold 24px Arial',
@@ -456,6 +525,7 @@ export default class MainMenuScene extends Phaser.Scene {
     });
     closeBtn.setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
+    closeBtn.setDepth(700);
     
     closeBtn.on('pointerover', () => {
       closeBtn.setStyle({ fill: COLORS.SECONDARY });
@@ -478,10 +548,13 @@ export default class MainMenuScene extends Phaser.Scene {
       closeBtn.destroy();
     });
     
-    // 遮罩層點擊關閉對話框
+    // 遮罩層事件處理 - 完全阻止事件穿透
     overlay.on('pointerup', (event) => {
-      if (event.target === overlay.canvas) {
-        event.stopPropagation();
+      // 無論如何都要阻止事件傳播
+      event.stopPropagation();
+      
+      // 如果點擊的是遮罩層本身，關閉對話框
+      if (event.target === overlay || event.target === overlay.canvas) {
         overlay.destroy();
         infoBox.destroy();
         title.destroy();
