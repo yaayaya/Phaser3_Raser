@@ -1,0 +1,98 @@
+{
+  "upgrades": [
+    {
+      "id": "moveSpeed",
+      "name": "移動速度",
+      "description": "提升玩家移動速度",
+      "basePrice": 50,
+      "priceMultiplier": 1.5,
+      "maxLevel": 10,
+      "baseValue": 180,
+      "valuePerLevel": 15
+    },
+    {
+      "id": "attackRange",
+      "name": "攻擊範圍",
+      "description": "增加武器鎖定距離",
+      "basePrice": 100,
+      "priceMultiplier": 1.5,
+      "maxLevel": 8,
+      "baseValue": 200,
+      "valuePerLevel": 25
+    },
+    {
+      "id": "attackCount",
+      "name": "攻擊數量",
+      "description": "同時攻擊多個目標",
+      "basePrice": 200,
+      "priceMultiplier": 2.0,
+      "maxLevel": 5,
+      "baseValue": 1,
+      "valuePerLevel": 1
+    },
+    {
+      "id": "attackDamage",
+      "name": "攻擊傷害",
+      "description": "提升每秒傷害值",
+      "basePrice": 75,
+      "priceMultiplier": 1.5,
+      "maxLevel": 15,
+      "baseValue": 15,
+      "valuePerLevel": 8
+    },
+    {
+      "id": "maxHealth",
+      "name": "最大生命值",
+      "description": "增加 HP 上限",
+      "basePrice": 80,
+      "priceMultiplier": 1.4,
+      "maxLevel": 10,
+      "baseValue": 100,
+      "valuePerLevel": 25
+    },
+    {
+      "id": "initialTime",
+      "name": "初始時間",
+      "description": "關卡開始時有更多時間",
+      "basePrice": 150,
+      "priceMultiplier": 1.6,
+      "maxLevel": 8,
+      "baseValue": 0,
+      "valuePerLevel": 5
+    },
+    {
+      "id": "coinMultiplier",
+      "name": "貨幣倍率",
+      "description": "增加關卡結算時的貨幣獲得量",
+      "basePrice": 250,
+      "priceMultiplier": 1.8,
+      "maxLevel": 10,
+      "baseValue": 0,
+      "valuePerLevel": 10,
+      "unit": "%"
+    }
+  ],
+  "weapons": [
+    {
+      "id": "laser",
+      "name": "雷射武器",
+      "description": "自動鎖定最近敵人的雷射攻擊",
+      "unlocked": true,
+      "unlockPrice": 0
+    },
+    {
+      "id": "missile",
+      "name": "飛彈發射器",
+      "description": "發射追蹤飛彈攻擊敵人 (未來版本)",
+      "unlocked": false,
+      "unlockPrice": 500
+    },
+    {
+      "id": "sword",
+      "name": "雷射劍",
+      "description": "短距離高傷害範圍攻擊 (未來版本)",
+      "unlocked": false,
+      "unlockPrice": 800
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>雷射防禦 - Laser Defense</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+      position: fixed;
+      touch-action: none;
+    }
+    #game {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

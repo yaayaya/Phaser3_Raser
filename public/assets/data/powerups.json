@@ -1,0 +1,58 @@
+{
+  "powerups": [
+    {
+      "id": "time",
+      "name": "時間增加",
+      "description": "增加關卡剩餘時間",
+      "icon": "powerup-time.png",
+      "effect": {
+        "type": "time",
+        "value": 15
+      },
+      "lifetime": 10,
+      "spawnChance": 1.0
+    },
+    {
+      "id": "health",
+      "name": "生命回復",
+      "description": "回復玩家生命值 (未來版本)",
+      "icon": "powerup-health.png",
+      "effect": {
+        "type": "health",
+        "value": 30
+      },
+      "lifetime": 10,
+      "spawnChance": 0.5
+    },
+    {
+      "id": "shield",
+      "name": "臨時護盾",
+      "description": "獲得短暫無敵效果 (未來版本)",
+      "icon": "powerup-shield.png",
+      "effect": {
+        "type": "shield",
+        "value": 5
+      },
+      "lifetime": 10,
+      "spawnChance": 0.3
+    },
+    {
+      "id": "damage",
+      "name": "傷害增強",
+      "description": "短暫提升攻擊傷害 (未來版本)",
+      "icon": "powerup-damage.png",
+      "effect": {
+        "type": "damageBoost",
+        "value": 2.0,
+        "duration": 10
+      },
+      "lifetime": 10,
+      "spawnChance": 0.4
+    }
+  ],
+  "globalSettings": {
+    "defaultLifetime": 10,
+    "blinkStartTime": 7,
+    "spawnAreaPadding": 100
+  }
+}

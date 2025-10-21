@@ -1,0 +1,297 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "name": "初始試煉",
+      "difficulty": "入門",
+      "unlockCondition": null,
+      "baseTime": 30,
+      "bossSpawnTime": 18,
+      "enemies": [
+        {
+          "type": "basic",
+          "spawnRate": 3000,
+          "speed": 75,
+          "health": 80,
+          "reward": 24,
+          "damage": 1
+        }
+      ],
+      "boss": {
+        "type": "basic-boss",
+        "speed": 45,
+        "health": 700,
+        "reward": 240,
+        "damage": 1
+      },
+      "powerUpSpawnInterval": 20,
+      "asteroids": {
+        "spawnInterval": 2500,
+        "initialCount": 20,
+        "sizeRatio": {
+          "small": 4,
+          "medium": 2,
+          "large": 1
+        }
+      },
+      "rewards": {
+        "completion": 160,
+        "timeBonus": 6
+      }
+    },
+    {
+      "id": 2,
+      "name": "隕石風暴",
+      "difficulty": "挑戰",
+      "unlockCondition": 1,
+      "baseTime": 30,
+      "bossSpawnTime": 16,
+      "enemies": [
+        {
+          "type": "basic",
+          "spawnRate": 2400,
+          "speed": 85,
+          "health": 110,
+          "reward": 30,
+          "damage": 1
+        },
+        {
+          "type": "fast",
+          "spawnRate": 3200,
+          "speed": 145,
+          "health": 76,
+          "reward": 44,
+          "damage": 1
+        }
+      ],
+      "boss": {
+        "type": "fast-boss",
+        "speed": 85,
+        "health": 1100,
+        "reward": 360,
+        "damage": 1
+      },
+      "powerUpSpawnInterval": 18,
+      "asteroids": {
+        "spawnInterval": 1800,
+        "initialCount": 25,
+        "sizeRatio": {
+          "small": 5,
+          "medium": 3,
+          "large": 2
+        }
+      },
+      "rewards": {
+        "completion": 280,
+        "timeBonus": 8
+      }
+    },
+    {
+      "id": 3,
+      "name": "終極挑戰",
+      "difficulty": "困難",
+      "unlockCondition": 2,
+      "baseTime": 30,
+      "bossSpawnTime": 14,
+      "enemies": [
+        {
+          "type": "basic",
+          "spawnRate": 2000,
+          "speed": 95,
+          "health": 130,
+          "reward": 36,
+          "damage": 1
+        },
+        {
+          "type": "tank",
+          "spawnRate": 3800,
+          "speed": 55,
+          "health": 360,
+          "reward": 90,
+          "damage": 1
+        }
+      ],
+      "boss": {
+        "type": "tank-boss",
+        "speed": 50,
+        "health": 1600,
+        "reward": 500,
+        "damage": 1
+      },
+      "powerUpSpawnInterval": 16,
+      "asteroids": {
+        "spawnInterval": 1500,
+        "initialCount": 25,
+        "sizeRatio": {
+          "small": 4,
+          "medium": 3,
+          "large": 2
+        }
+      },
+      "rewards": {
+        "completion": 440,
+        "timeBonus": 10
+      }
+    },
+    {
+      "id": 4,
+      "name": "深淵試煉",
+      "difficulty": "極難",
+      "unlockCondition": 3,
+      "baseTime": 30,
+      "bossSpawnTime": 13,
+      "enemies": [
+        {
+          "type": "basic",
+          "spawnRate": 1600,
+          "speed": 105,
+          "health": 150,
+          "reward": 44,
+          "damage": 1
+        },
+        {
+          "type": "fast",
+          "spawnRate": 2200,
+          "speed": 165,
+          "health": 90,
+          "reward": 56,
+          "damage": 1
+        },
+        {
+          "type": "tank",
+          "spawnRate": 3200,
+          "speed": 60,
+          "health": 400,
+          "reward": 110,
+          "damage": 1
+        }
+      ],
+      "boss": {
+        "type": "pattern-boss-2",
+        "speed": 55,
+        "health": 1800,
+        "reward": 800,
+        "damage": 1,
+        "bossType": 2
+      },
+      "powerUpSpawnInterval": 15,
+      "asteroids": {
+        "spawnInterval": 1200,
+        "initialCount": 120,
+        "sizeRatio": {
+          "small": 4,
+          "medium": 3,
+          "large": 3
+        }
+      },
+      "rewards": {
+        "completion": 700,
+        "timeBonus": 12
+      }
+    },
+    {
+      "id": 5,
+      "name": "終極毀滅",
+      "difficulty": "地獄",
+      "unlockCondition": 4,
+      "baseTime": 30,
+      "bossSpawnTime": 11,
+      "enemies": [
+        {
+          "type": "basic",
+          "spawnRate": 1400,
+          "speed": 115,
+          "health": 170,
+          "reward": 56,
+          "damage": 1
+        },
+        {
+          "type": "fast",
+          "spawnRate": 1800,
+          "speed": 175,
+          "health": 110,
+          "reward": 70,
+          "damage": 1
+        },
+        {
+          "type": "tank",
+          "spawnRate": 2600,
+          "speed": 65,
+          "health": 480,
+          "reward": 140,
+          "damage": 1
+        }
+      ],
+      "boss": {
+        "type": "pattern-boss-3",
+        "speed": 65,
+        "health": 2200,
+        "reward": 1200,
+        "damage": 1,
+        "bossType": 3
+      },
+      "powerUpSpawnInterval": 14,
+      "asteroids": {
+        "spawnInterval": 1000,
+        "initialCount": 220,
+        "sizeRatio": {
+          "small": 3,
+          "medium": 3,
+          "large": 4
+        }
+      },
+      "rewards": {
+        "completion": 1000,
+        "timeBonus": 16
+      }
+    },
+    {
+      "id": 6,
+      "name": "終極審判",
+      "difficulty": "煉獄",
+      "unlockCondition": 5,
+      "baseTime": 45,
+      "bossSpawnTime": 8,
+      "enemies": [
+        {
+          "type": "pattern-boss-3",
+          "spawnRate": 8000,
+          "speed": 70,
+          "health": 2200,
+          "reward": 1200,
+          "damage": 1,
+          "bossType": 3
+        }
+      ],
+      "boss": {
+        "type": "ultimate-boss",
+        "speed": 80,
+        "health": 10000,
+        "reward": 4000,
+        "damage": 1,
+        "bossType": 4
+      },
+      "powerUpSpawnInterval": 10,
+      "asteroids": {
+        "spawnInterval": 800,
+        "initialCount": 30,
+        "sizeRatio": {
+          "small": 2,
+          "medium": 3,
+          "large": 5
+        }
+      },
+      "rewards": {
+        "completion": 2000,
+        "timeBonus": 20
+      }
+    }
+  ],
+  "globalSettings": {
+    "canvasWidth": 375,
+    "canvasHeight": 667,
+    "aspectRatio": "9:16",
+    "powerUpLifetime": 10,
+    "asteroidSpawnEdge": true
+  }
+}
