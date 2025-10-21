@@ -2,18 +2,25 @@
  * 遊戲常數設定
  */
 
-// 畫布設定（手機豎立模式）
+// 畫布設定（基礎尺寸，會動態調整）
 export const CANVAS = {
   WIDTH: 375,
   HEIGHT: 667,
-  ASPECT_RATIO: 9 / 16
+  ASPECT_RATIO: 9 / 16,
+  // 動態取得實際螢幕尺寸
+  get ACTUAL_WIDTH() {
+    return window.innerWidth || this.WIDTH;
+  },
+  get ACTUAL_HEIGHT() {
+    return window.innerHeight || this.HEIGHT;
+  }
 };
 
 // 玩家設定
 export const PLAYER = {
   BASE_SPEED: 180,
   BASE_ATTACK_RANGE: 180,        // 初始攻擊距離較短，鼓勵升級
-  BASE_ATTACK_COUNT: 3,          // 雷射數量*3
+  BASE_ATTACK_COUNT: 1,          // 雷射數量改為1
   BASE_ATTACK_DAMAGE: 20,        // 初始 DPS=20，需要升級才能快速清怪
   BASE_MAX_HEALTH: 3,            // 核心設定：只有3滴血
   SIZE: 24,
@@ -185,4 +192,23 @@ export const COLORS = {
   BACKGROUND: '#272727ff',
   TEXT: '#ffffff',
   TEXT_DISABLED: '#666666'
+};
+
+// 虛擬搖桿設定
+export const VIRTUAL_JOYSTICK = {
+  BASE_RADIUS: 45,
+  STICK_RADIUS: 20,
+  MAX_DISTANCE: 35,
+  DEAD_ZONE: 0.15,
+  ALPHA: 0.7,
+  POSITION: {
+    X: 80,
+    Y_OFFSET: 80 // 距離底部的距離
+  },
+  COLORS: {
+    BASE: 0x333333,
+    STICK: 0x00ffff,
+    STROKE: 0x666666,
+    DIRECTION: 0x00ffff
+  }
 };

@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
-import { SCENES, CANVAS, PLAYER, GAME } from '../utils/constants.js';
+import { SCENES, CANVAS, PLAYER, GAME, VIRTUAL_JOYSTICK } from '../utils/constants.js';
 import { getGameData, updateCoins, unlockLevel, completeLevel } from '../utils/storage.js';
 import Player from '../entities/Player.js';
 import EnemyManager from '../systems/EnemyManager.js';
 import WeaponSystem from '../systems/WeaponSystem.js';
 import PowerUpSystem from '../systems/PowerUpSystem.js';
 import AsteroidManager from '../systems/AsteroidManager.js';
+import VirtualJoystick from '../ui/VirtualJoystick.js';
 
 /**
  * 主遊戲場景
@@ -70,8 +71,8 @@ export default class GameScene extends Phaser.Scene {
       right: this.input.keyboard.addKey('D')
     };
     
-    // 設定觸控輸入
-    this.setupTouchInput();
+    // 建立虛擬搖桿（手機設備）
+    this.setupVirtualJoystick();
     
     // 開始生成敵人
     this.enemyManager.startSpawning();
@@ -173,52 +174,39 @@ export default class GameScene extends Phaser.Scene {
     if (this.cursors.up.isDown || this.wasd.up.isDown) movement.y = -1;
     if (this.cursors.down.isDown || this.wasd.down.isDown) movement.y = 1;
     
-    // 觸控輸入
-    if (this.touchMovement) {
-      movement.x = this.touchMovement.x;
-      movement.y = this.touchMovement.y;
+    // 虛擬搖桿輸入
+    if (this.virtualJoystick && this.virtualJoystick.isActive()) {
+      const joystickDirection = this.virtualJoystick.getDirection();
+      const force = this.virtualJoystick.getForce();
+      movement.x = joystickDirection.x * force;
+      movement.y = joystickDirection.y * force;
     }
     
     return movement;
   }
   
-  setupTouchInput() {
-    this.touchMovement = null;
+  setupVirtualJoystick() {
+    // 檢測是否為觸控裝置
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
-    this.input.on('pointerdown', (pointer) => {
-      // 使用 worldX/worldY 而非 x/y
-      this.touchActive = true;
-      this.updateTouchMovement(pointer);
-    });
-    
-    this.input.on('pointermove', (pointer) => {
-      if (pointer.isDown && this.touchActive) {
-        this.updateTouchMovement(pointer);
-      }
-    });
-    
-    this.input.on('pointerup', () => {
-      this.touchMovement = null;
-      this.touchActive = false;
-    });
-  }
-  
-  updateTouchMovement(pointer) {
-    // 使用 worldX/worldY 來取得遊戲世界座標
-    const dx = pointer.worldX - this.player.x;
-    const dy = pointer.worldY - this.player.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // 如果點擊位置離玩家超過 20 像素，就向該方向移動
-    if (distance > 20) {
-      this.touchMovement = {
-        x: dx / distance,
-        y: dy / distance
-      };
-    } else {
-      this.touchMovement = null;
+    if (isTouchDevice) {
+      // 建立隱形虛擬搖桿
+      this.virtualJoystick = new VirtualJoystick(this, 0, 0, {
+        baseRadius: 0, // 不需要視覺範圍
+        stickRadius: 0,
+        maxDistance: 999, // 無限制距離
+        deadZone: 0.05, // 很小的死區
+        alpha: 0 // 完全透明
+      });
+      
+      // 設定全螢幕觸控
+      this.input.on('pointerdown', (pointer) => {
+        // 任意位置都可以開始控制
+        this.virtualJoystick.startDrag(pointer);
+      });
     }
   }
+  
   
   handlePlayerEnemyCollision() {
     const enemies = this.enemyManager.getAllEnemies();
