@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { SCENES, COLORS } from '../utils/constants.js';
 import { getGameData, resetGameData, getSetting, updateSetting } from '../utils/storage.js';
 import { formatNumber } from '../utils/helpers.js';
+import Modal from '../ui/Modal.js';
 
 /**
  * 主選單場景
@@ -151,220 +152,70 @@ export default class MainMenuScene extends Phaser.Scene {
   }
   
   showResetConfirmation() {
+    // 創建Modal實例
+    const modal = new Modal(this);
+    
+    // 創建對話框
+    modal.create({
+      width: 350,
+      height: 280,
+      bgColor: 0x1a1a2e,
+      borderColor: 0xff3333,
+      borderWidth: 3,
+      overlayAlpha: 0.9
+    });
+    
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     
-    // 遮罩層 - 增強事件阻止，特別針對手機版
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
-    overlay.setInteractive();
-    overlay.setDepth(500); // 設定適當深度
-    
-    // 全面阻止所有事件穿透，包括touch事件
-    const blockAllEvents = (event) => {
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-    };
-    
-    overlay.on('pointerdown', blockAllEvents);
-    overlay.on('pointermove', blockAllEvents);
-    overlay.on('pointerover', blockAllEvents);
-    overlay.on('pointerout', blockAllEvents);
-    overlay.on('touchstart', blockAllEvents);
-    overlay.on('touchmove', blockAllEvents);
-    overlay.on('touchend', blockAllEvents);
-    
-    // 對話框
-    const dialogBox = this.add.rectangle(width / 2, height / 2, 320, 240, 0x1a1a2e);
-    dialogBox.setStrokeStyle(3, 0xff3333);
-    dialogBox.setDepth(600); // 設定在遮罩層之上
-    
     // 警告圖示
-    const warningIcon = this.add.text(width / 2, height / 2 - 80, '⚠️', {
+    modal.addText(width / 2, height / 2 - 80, '⚠️', {
       font: '48px Arial'
     });
-    warningIcon.setOrigin(0.5);
-    warningIcon.setDepth(700);
     
     // 標題
-    const title = this.add.text(width / 2, height / 2 - 30, '確認重置遊戲？', {
+    modal.addText(width / 2, height / 2 - 30, '確認重置遊戲？', {
       font: 'bold 24px Arial',
       fill: '#ff3333'
     });
-    title.setOrigin(0.5);
-    title.setDepth(700);
     
     // 說明文字
-    const description = this.add.text(width / 2, height / 2 + 10, '將清除所有進度、代幣與升級\n此操作無法復原！', {
+    modal.addText(width / 2, height / 2 + 10, '將清除所有進度、代幣與升級\n此操作無法復原！', {
       font: '16px Arial',
       fill: COLORS.TEXT,
       align: 'center'
     });
-    description.setOrigin(0.5);
-    description.setDepth(700);
     
     // 確認按鈕
-    const confirmBtn = this.add.text(width / 2 - 70, height / 2 + 70, '確認重置', {
-      font: 'bold 18px Arial',
-      fill: '#ff3333'
-    });
-    confirmBtn.setOrigin(0.5);
-    confirmBtn.setInteractive({ useHandCursor: true });
-    confirmBtn.setPadding(12, 8);
-    
-    const confirmBg = this.add.rectangle(width / 2 - 70, height / 2 + 70, 120, 40, 0xff3333, 0.2);
-    confirmBg.setStrokeStyle(2, 0xff3333);
-    confirmBg.setDepth(650);
-    confirmBtn.setDepth(700);
-    
-    confirmBtn.on('pointerover', () => {
-      confirmBg.setFillStyle(0xff3333, 0.4);
-    });
-    
-    confirmBtn.on('pointerout', () => {
-      confirmBg.setFillStyle(0xff3333, 0.2);
-    });
-    
-    confirmBtn.on('pointerup', (event) => {
-      // 強制阻止事件穿透
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-      
-      // 手機版加延遲執行
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const executeReset = () => {
-        // 執行重置
-        resetGameData();
-        
-        // 清除對話框
-        if (overlay && overlay.scene) {
-          overlay.destroy();
-          dialogBox.destroy();
-          warningIcon.destroy();
-          title.destroy();
-          description.destroy();
-          confirmBtn.destroy();
-          confirmBg.destroy();
-          cancelBtn.destroy();
-          cancelBg.destroy();
-        }
-        
-        // 重新載入場景以更新顯示
-        this.scene.restart();
-      };
-      
-      if (isMobile) {
-        setTimeout(executeReset, 150);
-      } else {
-        executeReset();
-      }
+    modal.addButton(width / 2 - 70, height / 2 + 70, '確認重置', () => {
+      // 執行重置
+      resetGameData();
+      // 關閉Modal
+      modal.close();
+      // 重新載入場景以更新顯示
+      this.scene.restart();
+    }, {
+      width: 120,
+      height: 40,
+      bgColor: 0xff3333,
+      bgAlpha: 0.2,
+      borderColor: 0xff3333,
+      textColor: '#ff3333',
+      hoverBgAlpha: 0.4
     });
     
     // 取消按鈕
-    const cancelBtn = this.add.text(width / 2 + 70, height / 2 + 70, '取消', {
-      font: 'bold 18px Arial',
-      fill: COLORS.PRIMARY
+    modal.addButton(width / 2 + 70, height / 2 + 70, '取消', () => {
+      modal.close();
+    }, {
+      width: 100,
+      height: 40,
+      bgColor: 0x00ffff,
+      bgAlpha: 0.2,
+      borderColor: 0x00ffff,
+      textColor: COLORS.PRIMARY,
+      hoverBgAlpha: 0.4
     });
-    cancelBtn.setOrigin(0.5);
-    cancelBtn.setInteractive({ useHandCursor: true });
-    cancelBtn.setPadding(12, 8);
-    
-    const cancelBg = this.add.rectangle(width / 2 + 70, height / 2 + 70, 100, 40, 0x00ffff, 0.2);
-    cancelBg.setStrokeStyle(2, 0x00ffff);
-    cancelBg.setDepth(650);
-    cancelBtn.setDepth(700);
-    
-    cancelBtn.on('pointerover', () => {
-      cancelBg.setFillStyle(0x00ffff, 0.4);
-    });
-    
-    cancelBtn.on('pointerout', () => {
-      cancelBg.setFillStyle(0x00ffff, 0.2);
-    });
-    
-    cancelBtn.on('pointerup', (event) => {
-      // 強制阻止事件穿透，特別針對手機版
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-      
-      // 手機版加延遲執行，避免意外觸發
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const closeDialog = () => {
-        if (overlay && overlay.scene) {
-          overlay.destroy();
-          dialogBox.destroy();
-          warningIcon.destroy();
-          title.destroy();
-          description.destroy();
-          confirmBtn.destroy();
-          confirmBg.destroy();
-          cancelBtn.destroy();
-          cancelBg.destroy();
-        }
-      };
-      
-      if (isMobile) {
-        setTimeout(closeDialog, 150); // 增加延遲時間
-      } else {
-        closeDialog();
-      }
-    });
-    
-    // 遮罩層事件處理 - 完全阻止事件穿透
-    overlay.on('pointerup', (event) => {
-      // 強制阻止所有事件傳播
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-      
-      // 手機版加延遲關閉
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const closeDialog = () => {
-        if (overlay && overlay.scene) {
-          overlay.destroy();
-          dialogBox.destroy();
-          warningIcon.destroy();
-          title.destroy();
-          description.destroy();
-          confirmBtn.destroy();
-          confirmBg.destroy();
-          cancelBtn.destroy();
-          cancelBg.destroy();
-        }
-      };
-      
-      // 如果點擊的是遮罩層本身，關閉對話框
-      if (event.target === overlay || event.target === overlay.canvas) {
-        if (isMobile) {
-          setTimeout(closeDialog, 150);
-        } else {
-          closeDialog();
-        }
-      }
-    });
-    
-    // 額外的touch事件處理針對手機版
-    overlay.on('touchend', (event) => {
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-    });
-    
-    // 確保按鈕在背景之上
-    this.children.bringToTop(confirmBtn);
-    this.children.bringToTop(cancelBtn);
   }
   
   showSettings() {
