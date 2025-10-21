@@ -40,12 +40,16 @@ export default class Modal {
     // 完全阻止所有事件穿透
     this.setupOverlayEvents();
     
+    // 儲存對話框尺寸供事件處理使用
+    this.dialogWidth = config.width || 350;
+    this.dialogHeight = config.height || 280;
+    
     // 創建對話框背景
     this.dialogBg = this.scene.add.rectangle(
       width / 2, 
       height / 2, 
-      config.width || 350, 
-      config.height || 280, 
+      this.dialogWidth, 
+      this.dialogHeight, 
       config.bgColor || 0x1a1a2e
     );
     this.dialogBg.setStrokeStyle(config.borderWidth || 2, config.borderColor || 0x00ffff);
@@ -60,14 +64,40 @@ export default class Modal {
   }
   
   /**
-   * 設置遮罩層事件，完全阻止穿透
+   * 設置遮罩層事件，只有點擊對話框外部才關閉
    */
   setupOverlayEvents() {
-    // 只處理點擊事件來關閉Modal
+    // 只處理點擊事件來關閉Modal，但需檢查點擊位置
     this.overlay.on('pointerup', (event) => {
-      console.log('Overlay clicked, closing modal');
-      // Phaser 3 中透過 setInteractive 來阻止事件穿透
-      this.close();
+      console.log('Overlay clicked, checking position');
+      
+      // 檢查點擊位置是否在對話框範圍外
+      if (this.dialogBg && this.dialogWidth && this.dialogHeight) {
+        const centerX = this.scene.cameras.main.width / 2;
+        const centerY = this.scene.cameras.main.height / 2;
+        
+        const dialogBounds = {
+          left: centerX - this.dialogWidth / 2,
+          right: centerX + this.dialogWidth / 2,
+          top: centerY - this.dialogHeight / 2,
+          bottom: centerY + this.dialogHeight / 2
+        };
+        
+        const clickX = event.x;
+        const clickY = event.y;
+        
+        // 只有點擊對話框外部區域才關閉
+        if (clickX < dialogBounds.left || clickX > dialogBounds.right ||
+            clickY < dialogBounds.top || clickY > dialogBounds.bottom) {
+          console.log('Overlay clicked outside dialog, closing modal');
+          this.close();
+        } else {
+          console.log('Clicked inside dialog, keeping modal open');
+        }
+      } else {
+        // 如果沒有對話框背景，直接關閉
+        this.close();
+      }
     });
     
     // 阻止其他事件穿透
@@ -198,6 +228,8 @@ export default class Modal {
     this.container = null;
     this.overlay = null;
     this.dialogBg = null;
+    this.dialogWidth = null;
+    this.dialogHeight = null;
     this.onCloseCallback = null;
     
     console.log('Modal closed successfully');

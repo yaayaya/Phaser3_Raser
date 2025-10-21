@@ -350,13 +350,22 @@ export default class MainMenuScene extends Phaser.Scene {
       closeBtn.destroy();
     });
     
-    // 遮罩層事件處理 - 完全阻止事件穿透
+    // 遮罩層事件處理 - 只有點擊對話框外部區域才關閉
     overlay.on('pointerup', (event) => {
-      // 無論如何都要阻止事件傳播
-      // Phaser 3 中透過 setInteractive 來阻止事件穿透
+      // 檢查點擊位置是否在對話框範圍外
+      const dialogBounds = {
+        left: width / 2 - 175,   // 350/2
+        right: width / 2 + 175,
+        top: height / 2 - 140,   // 280/2
+        bottom: height / 2 + 140
+      };
       
-      // 如果點擊的是遮罩層本身，關閉對話框
-      if (event.target === overlay || event.target === overlay.canvas) {
+      const clickX = event.x;
+      const clickY = event.y;
+      
+      // 只有點擊對話框外部區域才關閉
+      if (clickX < dialogBounds.left || clickX > dialogBounds.right ||
+          clickY < dialogBounds.top || clickY > dialogBounds.bottom) {
         overlay.destroy();
         dialogBox.destroy();
         title.destroy();
@@ -455,16 +464,28 @@ export default class MainMenuScene extends Phaser.Scene {
       closeBtn.destroy();
     });
     
-    // 遮罩層事件處理 - 完全阻止事件穿透
+    // 遮罩層事件處理 - 只有點擊對話框外部區域才關閉
     overlay.on('pointerup', (event) => {
-      // Phaser 3 中透過 setInteractive 來阻止事件穿透
+      // 檢查點擊位置是否在對話框範圍外
+      const dialogBounds = {
+        left: width / 2 - 400,   // 800/2
+        right: width / 2 + 400,
+        top: height / 2 - 250,   // 500/2
+        bottom: height / 2 + 250
+      };
       
-      // 關閉對話框
-      overlay.destroy();
-      infoBox.destroy();
-      title.destroy();
-      infoText.destroy();
-      closeBtn.destroy();
+      const clickX = event.x;
+      const clickY = event.y;
+      
+      // 只有點擊對話框外部區域才關閉
+      if (clickX < dialogBounds.left || clickX > dialogBounds.right ||
+          clickY < dialogBounds.top || clickY > dialogBounds.bottom) {
+        overlay.destroy();
+        infoBox.destroy();
+        title.destroy();
+        infoText.destroy();
+        closeBtn.destroy();
+      }
     });
   }
 }
