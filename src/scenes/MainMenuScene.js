@@ -154,24 +154,27 @@ export default class MainMenuScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     
-    // 遮罩層 - 阻止所有點擊事件穿透
+    // 遮罩層 - 增強事件阻止，特別針對手機版
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
     overlay.setInteractive();
     overlay.setDepth(500); // 設定適當深度
     
-    // 阻止所有滑鼠事件穿透
-    overlay.on('pointerdown', (event) => {
+    // 全面阻止所有事件穿透，包括touch事件
+    const blockAllEvents = (event) => {
       event.stopPropagation();
-    });
-    overlay.on('pointermove', (event) => {
-      event.stopPropagation();
-    });
-    overlay.on('pointerover', (event) => {
-      event.stopPropagation();
-    });
-    overlay.on('pointerout', (event) => {
-      event.stopPropagation();
-    });
+      event.stopImmediatePropagation();
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+    };
+    
+    overlay.on('pointerdown', blockAllEvents);
+    overlay.on('pointermove', blockAllEvents);
+    overlay.on('pointerover', blockAllEvents);
+    overlay.on('pointerout', blockAllEvents);
+    overlay.on('touchstart', blockAllEvents);
+    overlay.on('touchmove', blockAllEvents);
+    overlay.on('touchend', blockAllEvents);
     
     // 對話框
     const dialogBox = this.add.rectangle(width / 2, height / 2, 320, 240, 0x1a1a2e);
@@ -225,27 +228,41 @@ export default class MainMenuScene extends Phaser.Scene {
     });
     
     confirmBtn.on('pointerup', (event) => {
-      // 只在確認重置時阻止事件冒泡
-      if (event.target === confirmBtn || event.target === confirmBtn.canvas) {
-        event.stopPropagation();
+      // 強制阻止事件穿透
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (event.preventDefault) {
+        event.preventDefault();
       }
       
-      // 執行重置
-      resetGameData();
+      // 手機版加延遲執行
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const executeReset = () => {
+        // 執行重置
+        resetGameData();
+        
+        // 清除對話框
+        if (overlay && overlay.scene) {
+          overlay.destroy();
+          dialogBox.destroy();
+          warningIcon.destroy();
+          title.destroy();
+          description.destroy();
+          confirmBtn.destroy();
+          confirmBg.destroy();
+          cancelBtn.destroy();
+          cancelBg.destroy();
+        }
+        
+        // 重新載入場景以更新顯示
+        this.scene.restart();
+      };
       
-      // 清除對話框
-      overlay.destroy();
-      dialogBox.destroy();
-      warningIcon.destroy();
-      title.destroy();
-      description.destroy();
-      confirmBtn.destroy();
-      confirmBg.destroy();
-      cancelBtn.destroy();
-      cancelBg.destroy();
-      
-      // 重新載入場景以更新顯示
-      this.scene.restart();
+      if (isMobile) {
+        setTimeout(executeReset, 150);
+      } else {
+        executeReset();
+      }
     });
     
     // 取消按鈕
@@ -271,38 +288,77 @@ export default class MainMenuScene extends Phaser.Scene {
     });
     
     cancelBtn.on('pointerup', (event) => {
-      // 只在對話框取消時阻止事件冒泡
-      if (event.target === cancelBtn || event.target === cancelBtn.canvas) {
-        event.stopPropagation();
+      // 強制阻止事件穿透，特別針對手機版
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (event.preventDefault) {
+        event.preventDefault();
       }
       
-      overlay.destroy();
-      dialogBox.destroy();
-      warningIcon.destroy();
-      title.destroy();
-      description.destroy();
-      confirmBtn.destroy();
-      confirmBg.destroy();
-      cancelBtn.destroy();
-      cancelBg.destroy();
+      // 手機版加延遲執行，避免意外觸發
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const closeDialog = () => {
+        if (overlay && overlay.scene) {
+          overlay.destroy();
+          dialogBox.destroy();
+          warningIcon.destroy();
+          title.destroy();
+          description.destroy();
+          confirmBtn.destroy();
+          confirmBg.destroy();
+          cancelBtn.destroy();
+          cancelBg.destroy();
+        }
+      };
+      
+      if (isMobile) {
+        setTimeout(closeDialog, 150); // 增加延遲時間
+      } else {
+        closeDialog();
+      }
     });
     
     // 遮罩層事件處理 - 完全阻止事件穿透
     overlay.on('pointerup', (event) => {
-      // 無論如何都要阻止事件傳播
+      // 強制阻止所有事件傳播
       event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+      
+      // 手機版加延遲關閉
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const closeDialog = () => {
+        if (overlay && overlay.scene) {
+          overlay.destroy();
+          dialogBox.destroy();
+          warningIcon.destroy();
+          title.destroy();
+          description.destroy();
+          confirmBtn.destroy();
+          confirmBg.destroy();
+          cancelBtn.destroy();
+          cancelBg.destroy();
+        }
+      };
       
       // 如果點擊的是遮罩層本身，關閉對話框
       if (event.target === overlay || event.target === overlay.canvas) {
-        overlay.destroy();
-        dialogBox.destroy();
-        warningIcon.destroy();
-        title.destroy();
-        description.destroy();
-        confirmBtn.destroy();
-        confirmBg.destroy();
-        cancelBtn.destroy();
-        cancelBg.destroy();
+        if (isMobile) {
+          setTimeout(closeDialog, 150);
+        } else {
+          closeDialog();
+        }
+      }
+    });
+    
+    // 額外的touch事件處理針對手機版
+    overlay.on('touchend', (event) => {
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (event.preventDefault) {
+        event.preventDefault();
       }
     });
     
